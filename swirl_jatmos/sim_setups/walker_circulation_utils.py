@@ -21,7 +21,6 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import pandas as pd
-import xarray as xr
 
 Array: TypeAlias = jax.Array
 
@@ -139,30 +138,3 @@ def regularize_q_t_for_sounding(
   return q_t_reg
 
 
-def create_theta_li_sounding(
-    ds_ckpt: xr.Dataset, ds_diag: xr.Dataset
-) -> np.ndarray:
-  """Create a sounding of θ_li(z) from the checkpoint and diagnostics data.
-
-  Because of the split into θ_li0 and dθ_li, it's a little more complicated than
-  might be expected to just get the mean value of θ_li at the end of the
-  simulation.  The diagnostics have the mean value of dθ_li, but do not contain
-  the θ_li0 value.  So, we have to compute the θ_li0 value from the checkpoint
-  data.  To get the θ_li0 value, we use the θ_li value from the first checkpoint
-  (which is the initial condition).
-
-  Use from days 70 to the end of the simulation to get the sounding.
-
-  Args:
-    ds_ckpt: The checkpoint data.
-    ds_diag: The diagnostics data.
-
-  Returns:
-    The θ_li sounding, a 1D numpy array.
-  """
-  theta_li_0 = ds_ckpt.theta_li.isel(t=0).mean(dim=['x', 'y']).to_numpy()
-  dtheta_li = (
-      ds_diag.dtheta_li_1d_z.sel(t=slice('70d', None)).mean(dim='t').to_numpy()
-  )
-  theta_li_sounding = theta_li_0 + dtheta_li
-  return theta_li_sounding
