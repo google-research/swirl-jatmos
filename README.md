@@ -25,29 +25,36 @@ See colab demos:
 - [RCEMIP demo](swirl_jatmos/demos/rcemip_demo.ipynb)
 
 ## Equations solved
+Prognostic equations are solved for the following variables:
 
-- Anelastic momentum equations: velocities $u$, $v$, $w$
-- Continuity equation: determines the pressure $p$ through a Poisson equation
-- Linearized liquid-ice potential temperature $\theta_{li}$ (energy-like
-variable)
+- Velocities $u$, $v$, $w$ (anelastic momentum equation)
+- Linearized liquid-ice potential temperature $\theta_{li}$
 - Total specific humidity $q_t$
 - Mass fractions for 2 precipitation species, rain $q_r$ and snow $q_s$
 
+Additionally, the continuity equation is imposed in the form of a
+divergence-free mass flux $\nabla \cdot (\rho \mathbf{u}) = 0$, which determines
+the pressure $p$ through the solution to a Poisson equation.
+
 ## Features of Jatmos
 
-- Staggered grid
-- Conservative formulation
-- Boundary conditions: periodic boundary in the horizontal, no-slip or free-slip
-in the vertical
+- Staggered grid in Cartesian coordinates, nonuniform grid allowed
+- Conservative finite-volume formulation
+- WENO5 (among other) methods for convection
+- RK3 timestepper
+- Adaptive timestepping based on a CFL condition
 - Equilibrium thermodynamics for water phases
 - One-moment microphysics
 - Poisson solver via a tensor-product-based decomposition
 - RRTMGP radiative transfer
-- RK3 timestepper and adaptive timestepping based on a CFL condition
+- Boundary conditions: periodic in the horizontal, no-slip or free-slip in the
+vertical
+- Distributed checkpointing using Orbax
 - Simulations are performed in FP32 precision
+- Can run on TPU and GPU
 
 ## Benchmarking
-Using Google TPUv6e (Trillium), benchmark performance results with 256^3 grid
+Using Google TPUv6e (Trillium), benchmark performance results with $256^3$ grid
 points per TPU core are as follows:
 
 | # of TPU cores  | Wall time per timestep (ms) |
@@ -64,4 +71,4 @@ the pressure Poisson solver, and the equilibrium thermodynamics nonlinear solve.
  RRTMGP is not included within the benchmark.
 
 (Note that JAX's automatic parallelization is used, and no specific effort has
-yet been made to optimize the communication)
+yet been made to optimize the performance at a large number of cores.)
