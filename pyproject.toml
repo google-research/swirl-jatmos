@@ -20,7 +20,7 @@ dependencies = [
     "absl-py",
     "dataclasses-json",
     "etils",
-    "jax",
+    "jax[cuda]",
     "netCDF4",
     "numpy",
     "orbax",
